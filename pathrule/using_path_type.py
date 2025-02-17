@@ -512,8 +512,8 @@ def is_path_there_call(context):
     
     #checking for an experimental use case
     if (context.call_function_name_qual=='html.escape' and not 'usepath.py' in context.filename):
-        print("We want the security logic around html.escape to be in C:\\Users\\90948045\\OneDrive - Western Sydney University\\Eclipse Workspace\\mypythonbadcode\\callers\\usepath.py, but it was found in", context.filename)
-        print("If the outcome of the Game Theoretic analysis is to finx, this plugin will checking a copy of the code with the logic in C:\\Users\\90948045\\OneDrive - Western Sydney University\\Eclipse Workspace\\mypythonbadcode\\callers\\usepath.py. It can be a candidate for merging with the main branch.")
+        print("We want the security logic around html.escape to be in usepath.py, but it was found in", context.filename)
+        print("If the outcome of the Game Theoretic analysis is to finx, this plugin will checking a copy of the code with the logic in usepath.py. It can be a candidate for merging with the main branch.")
         r"""
         TODO
         1. Call VCG payment calculator with actual values. Values below are dummy ones. (the num of hops can be = the distance from the source to the end validation location, farther it is, more is the num of hops, making it worse for the dev)
