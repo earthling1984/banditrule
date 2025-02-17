@@ -1,6 +1,6 @@
 #
-# Copyright 2023 Mithun Vaidhyanathan
-# License: GNU License
+# Author: Mithun Vaidhyanathan
+# License: Apache-2.0 License
 #
 from bandit.core.context import Context
 import ast
