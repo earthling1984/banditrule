@@ -51,25 +51,25 @@ One test case checked was if the defensive code is in an unexpected class, or no
 ![plot](./images/RepetitionExample.png)
 
 ## Useful references
-Bandit in general: https://github.com/PyCQA/bandit/tree/main
-An advice on installing a Bandit plugin, which is what we have in our setup.py: https://github.com/PyCQA/bandit/issues/214
-A neat Bandit plugin that's a SARIF formatter, which served as an inspiration around Bandit plugins: https://github.com/microsoft/bandit-sarif-formatter/blob/main/bandit_sarif_formatter/formatter.py
-CVE categories accounting, which will be factored into the base probabilities that our game needs: https://www.cvedetails.com/vulnerabilities-by-types.php
-A thought-provoking paper from the original literature review, which could have a role to play in my work/vice-versa: https://ieeexplore.ieee.org/abstract/document/7163211
-A paper that could be useful in future: https://papers.academic-conferences.org/index.php/eccws/article/view/1154
-A book that could be useful in the future: https://www.oreilly.com/library/view/secure-programming-with/9780321424778/ch01.html
-Inspiration on how we generate call graphs: https://cerfacs.fr/coop/pycallgraph
-Useful guide in spinning up a test Flask app: https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
-More on Flask apps: https://www.geeksforgeeks.org/flask-app-routing/?ref=lbp
-Bandit plugin testing: https://bandit.readthedocs.io/en/latest/plugins/index.html#writing-tests
-Some initial reading around modifying the source that an AST represents: https://stackoverflow.com/questions/768634/parse-a-py-file-read-the-ast-modify-it-then-write-back-the-modified-source-c
-An interesting unparser of something that's parsed: https://svn.python.org/projects/python/trunk/Demo/parser/unparse.py
-More unparsing discussions: https://stackoverflow.com/questions/3774162/given-an-ast-is-there-a-working-library-for-getting-the-source
-More AST unparsing: https://astunparse.readthedocs.io/en/latest/index.html
-Plugin types based on Abstract Grammar?: https://docs.python.org/3/library/ast.html
+- Bandit in general: https://github.com/PyCQA/bandit/tree/main
+- An advice on installing a Bandit plugin, which is what we have in our setup.py: https://github.com/PyCQA/bandit/issues/214
+- A neat Bandit plugin that's a SARIF formatter, which served as an inspiration around Bandit plugins: https://github.com/microsoft/bandit-sarif-formatter/blob/main/bandit_sarif_formatter/formatter.py
+- CVE categories accounting, which will be factored into the base probabilities that our game needs: https://www.cvedetails.com/vulnerabilities-by-types.php
+- A thought-provoking paper from the original literature review, which could have a role to play in my work/vice-versa: https://ieeexplore.ieee.org/abstract/document/7163211
+- A paper that could be useful in future: https://papers.academic-conferences.org/index.php/eccws/article/view/1154
+- A book that could be useful in the future: https://www.oreilly.com/library/view/secure-programming-with/9780321424778/ch01.html
+- Inspiration on how we generate call graphs: https://cerfacs.fr/coop/pycallgraph
+- Useful guide in spinning up a test Flask app: https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
+- More on Flask apps: https://www.geeksforgeeks.org/flask-app-routing/?ref=lbp
+- Bandit plugin testing: https://bandit.readthedocs.io/en/latest/plugins/index.html#writing-tests
+- Some initial reading around modifying the source that an AST represents: https://stackoverflow.com/questions/768634/parse-a-py-file-read-the-ast-modify-it-then-write-back-the-modified-source-c
+- An interesting unparser of something that's parsed: https://svn.python.org/projects/python/trunk/Demo/parser/unparse.py
+- More unparsing discussions: https://stackoverflow.com/questions/3774162/given-an-ast-is-there-a-working-library-for-getting-the-source
+- More AST unparsing: https://astunparse.readthedocs.io/en/latest/index.html
+- Plugin types based on Abstract Grammar?: https://docs.python.org/3/library/ast.html
 
 ## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+TBC
 
 ## License
 Apache-2.0 license
