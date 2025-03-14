@@ -1,6 +1,6 @@
 #
-# Author: Mithun Vaidhyanathan
-# License: Apache-2.0 License
+# Copyright 2023 Mithun Vaidhyanathan
+# License: GNU License
 #
 from bandit.core.context import Context
 import ast
@@ -28,6 +28,7 @@ import itertools
 import nashpy
 
 import json
+from _ast import If
 
 r"""
 T.B.C
@@ -35,6 +36,9 @@ T.B.C
 2. creation of graph
 3. game design and analysis
 4. modify code base with secure code
+
+Post PhD - unclear if a plugin like this can be split into different modules. Wasn't an important task for the research itself,
+but for better usability, modular programming is to be implemented in future.
 """
 str_counter=0
 call_counter=0
@@ -47,8 +51,9 @@ desired_global_graph_dir = nx.DiGraph()
 desired_global_graph_undir = nx.DiGraph()
 files_processed_so_far = []
 #Mainly to help with the experiment.
-expected_list_of_files = ['']
+expected_list_of_files = []
 pass_number = 0
+finxed_line = "name=up.using_path(firstname)"
 
 def solve_zerosum_with_linprog(U):
     '''solve_zerosum_with_linprog(): Solve a zero sum game using linear programming
@@ -282,7 +287,8 @@ def IESDS(A, U, DOPRINT=False, maxit=10000):
 
 def compute_full_matrix(U1, U2, p, action_names=None):
     """      
-    "        Source of this method: https://github.com/GamEconCph/2023-lectures/blob/main/Bayesian%20Games/BNE.ipynb?short_path=6214124
+    "        Source of this method, and the ones above too: https://github.com/GamEconCph/2023-lectures/blob/main/Bayesian%20Games/BNE.ipynb?short_path=6214124
+    "        This method has been tweaked to accommodate the theory of conservation of payoffs, which result in jagged matrices/arrays
     "        Assumes that only player 2's type varies \n",
     "        (this means that player 1 has one action per row in U1, \n",
     "         while 2 has nA2**2 (one choice per type))\n",
@@ -302,16 +308,54 @@ def compute_full_matrix(U1, U2, p, action_names=None):
     assert len(U2) == 2
     assert np.isscalar(p)
     nA1, nA2 = U1[0].shape
+    print("nA1 is",nA1)
+    print("nA2 is",nA2)
     t1 = np.empty((nA1, nA2*nA2))
     t2 = np.empty((nA1, nA2*nA2))
+    print("t1 is",t1)
+    print("t2 is",t2)
     
     for ia1 in range(nA1):
+        print("Processing ia1 =",ia1)
         i_col = 0
         
         for a2_1 in range(nA2):
+            print("Outer for loop a2_1 =",a2_1)
             for a2_2 in range(nA2):
+                print("Inner for loop a2_2",a2_2)
+                print("U1[0][ia1,a2_1] is",U1[0][ia1,a2_1])
+                print("U1[1][ia1,a2_2] is",U1[1][ia1,a2_2])
+                print("U2[0][ia1,a2_1] is",U2[0][ia1,a2_1])
+                print("U2[1][ia1,a2_2] is",U2[1][ia1,a2_2])
+                """
+                Base logic
                 t1[ia1,i_col] = p*U1[0][ia1,a2_1] + (1.-p)*U1[1][ia1,a2_2]
                 t2[ia1,i_col] = p*U2[0][ia1,a2_1] + (1.-p)*U2[1][ia1,a2_2]
+                """                    
+                if (((U1[0][ia1,a2_1]) == "no-game") or ((U1[1][ia1,a2_2]) == "no-game")):
+                    if (((U1[0][ia1,a2_1]) == "no-game") and not ((U1[1][ia1,a2_2]) == "no-game")):
+                        t1[ia1,i_col] = (1.-p)*float(U1[1][ia1,a2_2])
+                    elif (not ((U1[0][ia1,a2_1]) == "no-game") and ((U1[1][ia1,a2_2]) == "no-game")):
+                        t1[ia1,i_col] = p*float(U1[0][ia1,a2_1])
+                    else:
+                        print("Looks like we got all no-games, so skipping assignments altogether")
+                        continue
+                else:
+                    t1[ia1,i_col] = p*float(U1[0][ia1,a2_1]) + (1.-p)*float(U1[1][ia1,a2_2])
+                    
+                if (((U2[0][ia1,a2_1]) == "no-game") or ((U2[1][ia1,a2_2]) == "no-game")):
+                    if (((U2[0][ia1,a2_1]) == "no-game") and not ((U2[1][ia1,a2_2]) == "no-game")):
+                        t1[ia1,i_col] = (1.-p)*float(U2[1][ia1,a2_2])
+                    elif (not ((U2[0][ia1,a2_1]) == "no-game") and ((U2[1][ia1,a2_2]) == "no-game")):
+                        t1[ia1,i_col] = p*float(U2[0][ia1,a2_1])
+                    else:
+                        print("Looks like we got all no-games, so skipping assignments altogether")
+                        continue
+                else:
+                    print("Am inside the else in the innermost for loop")
+                    print("U2[0][ia1,a2_1] is",U2[0][ia1,a2_1])
+                    print("U2[1][ia1,a2_2] is",U2[1][ia1,a2_2])
+                    t2[ia1,i_col] = p*float(U2[0][ia1,a2_1]) + (1.-p)*float(U2[1][ia1,a2_2])
                 
                 i_col +=1
                 
@@ -765,6 +809,7 @@ def is_path_there_call(context):
         math_compatibility_factor = 1 #between 0 and 1?
         math_incompatibility_factor = 1 #between 0 and 1?
         sdlc_cycles = 1 #T.B.C: number of branches/commits can indicate cyclicity factor?
+        #need to add the VCG style formula implementation of with/without the player below, to justify things
         payment_to_others = (num_usepath_not_used+avg_shortest_path_length)/2
         payment_to_others = payment_to_others*math_compatibility_factor*math_incompatibility_factor
         payment_to_sec = total_in
@@ -823,24 +868,26 @@ def is_path_there_call(context):
         Up --> 3,3|0,4
         Down --> 2,1|1,2
         
+        ONE-STONE-MULTIPLE-TARGETS
         XSS/Input Validation/Design Issue (multiply by line numbers, and release cycle count pending)
-        Regular Payoff Matrix                            Irregular Payoff Matrix (idea derived from Irregular Matrix/Jagged Arrays)
-                Finx/Don't                                Finx/Don't
-        Fix    -23,20/-20,-20        OR        Fix        -23,20/-20,-20
+        Regular Payoff Matrix  (R_iv)                              Jagged Payoff Matrix (J_iv) (idea derived from Irregular Matrix/Jagged Arrays)
+                Finx|Don't                                                    Finx|Don't
+        Fix    -23,20|-20,-20                                      Fix        -23,20|-20,-20
                                                 
-        Don't  0,20/-20+x,-20+x                Don't        0,20/
-                
+        Don't  0,20|no-game,no-game                                Don't        0,20|
+        
         SH: 0.8
                 L|R
         Up --> 3,3|0,2
         Down --> 2,0|1,1
         
+        ONE-STONE-ONE-TARGET
         SQL Injection Tautology based (multiply, for a DB vendor, by every user in the world who has to parameterize the query)
-        Regular Payoff Matrix                            Irregular Payoff Matrix
-                Finx/Don't                                Finx/Don't
-        Fix     -23,3/-3,-3                      Fix      -23,3/-3,-3
+        Regular Payoff Matrix  (R_db)                                 Jagged Payoff Matrix (J_db)
+                Finx|Don't                                                     Finx|Don't
+        Fix     -23,3|-3,-3                                           Fix      -23,3|-3,-3
         
-        Don't   0,3/-3+x,-3+x                   Don't     0,3/
+        Don't   0,3|no-game,no-game                                   Don't     0,3|
         
         The combined matrix (we could argue to re-composing matrices to the universal game here):
                         LL|LR|RL|RR
@@ -861,15 +908,31 @@ def is_path_there_call(context):
         Simple rule - if cycle found, then tautology, hence finx. No questions asked for this category, as it's the DB vendor code (like mysql) 
         Can be less strict for above.
         
+        Above, we went from jagged to regular payoff matrix by stating "skip" in the cell locations that were empty in the 
+        jagged payoff matrix
+        
+        Question: for now, convert jagged matrix into regular matrix by saying value = 0 in missing places? But is that a true indication
+        of the value? What if it's negative, or even positive? We could introduce a residue/error, similar to the constant of
+        integration, and then proceed. Let's also implement Iliffe vectors, if in doubt. Or maybe, add a placeholder in the missing cells,
+        and let those placeholders indicate unknowns, to not be acted upon.
+        
+        1. Expect nulls, catch it, and do something?
+        2. Something = assume it 0 for the time being, average this and other payoffs, and populate some other list for this assumption? The list being a warning, saying, assuming 0 for now, but unsure if actual payoff is a bad negative value?
+        3. Something = something else? Like -(OWASP estimate/some other estimate of loss) 
+        4. Something = leave it for non-technical/financial/risk function to solve?
+        5. Something = set worst case value of a hack to be = num of ALL files owned by company*num of lines (simplistic monetary value of code from a dev perspective, to showcase the worst case being a company shutting down, which makes ALL their code useless, and that's the loss from a dev perspective)
+        
+        Future work: improve game analysis techniques for games with jagged payoff matrices.
+        
         """
         #T.B.C - add SDLC metrics
         #in addition to the graph with in-out metrics, is another graph possible to visualize for the same category with finx. Should those 2 be compared with those of other categories in the Bayesian analysis? Or do we keep them separate as analyses? 
-        u1 = np.array([[-23,-23], [0,0]]) #To be defined by calling game_helper.add_games_payoffs or multiply_games_payoffs, recompose a game
+        u1 = np.array([[-(payment_to_others),-(payment_to_others)], [0,0]]) #To be defined by calling game_helper.add_games_payoffs or multiply_games_payoffs, recompose a game
         U1 = [u1, u1]
         A1 = ['U', 'D']
         
-        u21 = np.array([[20,-20], [20,-20]]) #To be defined by calling game_helper.add_games_payoffs or multiply_games_payoffs, recompose a game
-        u22 = np.array([[3,-3], [3,-3]]) #randomly made by me, need refining, but more to capture that sec may not finx all - i.e 20 instead of 21 hops, maybe due to false positive/other reason#To be defined by calling game_helper.add_games_payoffs or multiply_games_payoffs, recompose a game
+        u21 = np.array([[(payment_to_sec),-(payment_to_sec)], [20,"no-game"]]) #To be defined by calling game_helper.add_games_payoffs or multiply_games_payoffs, recompose a game
+        u22 = np.array([[3,-3], [3,"no-game"]]) #randomly made by me, need refining, but more to capture that sec may not finx all - i.e 20 instead of 21 hops, maybe due to false positive/other reason#To be defined by calling game_helper.add_games_payoffs or multiply_games_payoffs, recompose a game
         U2 = [u21, u22]
         a2 = ['L', 'R']
         A2 = [f'{a}{b}' for a in a2 for b in a2]
@@ -905,9 +968,8 @@ def is_path_there_call(context):
         for strategy_string in strategy_security:
             for strategy in strategy_string:
                 if strategy == 'L':
-                    #Need to store some flag for the game type, and finxing the file and location accordingly
                     #Use modularity/cyclicity for decision?
-                    print("will finx this file/line")
+                    print("will finx this file/line, if the annotation @finx is encountered")
         #FINAL NUMBERS TO SHOW/INTERPRET - speed/accuracy/something else? - work with experimental values
         #SHOW THEORETICAL STRENGTH FOR RECOMPOSING TO UNIVERSAL GAME? - work with dummy values
         #ARGUE ABOUT MIX OF (THEORETICAL STRENGTH+EXPERIMENTAL STRENGTH)/2?
